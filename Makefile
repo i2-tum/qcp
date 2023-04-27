@@ -17,7 +17,7 @@ python:
 	pyenv install -s 3.7.16
 	pyenv virtualenv -f 3.7.16 env3.7
 	eval "$$(pyenv init -)"; \
-    eval "$$(pyenv virtualenv-init -)"; \
+	eval "$$(pyenv virtualenv-init -)"; \
 	pyenv activate env3.7; \
 	pip install --upgrade pip; \
 	pip install -r scripts/lib/rpo/requirements.txt; \
@@ -26,7 +26,7 @@ python:
 	pyenv install -s 3.10.10
 	pyenv virtualenv -f 3.10.10 env3.10
 	eval "$$(pyenv init -)"; \
-    eval "$$(pyenv virtualenv-init -)"; \
+	eval "$$(pyenv virtualenv-init -)"; \
 	pyenv activate env3.10; \
 	pip install --upgrade pip; \
 	pip install -r requirements.txt
