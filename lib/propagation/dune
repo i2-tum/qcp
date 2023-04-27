@@ -1,0 +1,3 @@
+(library
+ (name propagation)
+ (libraries uniontable flatlattice quantumstate circuit logging zarith))

@@ -1,0 +1,772 @@
+name: Evaluate Qcprop
+timeout: 60
+root-dir: ../bench  # this is relative to the script.sh
+jobs:
+  qcprop0:
+    name: Run qcprop 0
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop0.yml)
+  qcprop1:
+    name: Run qcprop 1
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop1.yml)
+  qcprop2:
+    name: Run qcprop 2
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop2.yml)
+  qcprop4:
+    name: Run qcprop 4
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop4.yml)
+  qcprop8:
+    name: Run qcprop 8
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop8.yml)
+  qcprop16:
+    name: Run qcprop 16
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop16.yml)
+  qcprop32:
+    name: Run qcprop 32
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop32.yml)
+  qcprop64:
+    name: Run qcprop 64
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop64.yml)
+  qcprop128:
+    name: Run qcprop 128
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop128.yml)
+  qcprop256:
+    name: Run qcprop 256
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop256.yml)
+  qcprop512:
+    name: Run qcprop 512
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop512.yml)
+  qcprop1024:
+    name: Run qcprop 1024
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop1024.yml)
+  qcprop2048:
+    name: Run qcprop 2048
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop2048.yml)
+  qcprop4096:
+    name: Run qcprop 4096
+    input: orig
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop4096.yml)
+  qcprop0_qiskit:
+    name: Run Qiskit after qcprop 0
+    input: qcprop0
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop0_tket:
+    name: Run Tket after qcprop 0
+    input: qcprop0
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop0_pyzx:
+    name: Run PyZX after qcprop 0
+    input: qcprop0
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop1_qiskit:
+    name: Run Qiskit after qcprop 1
+    input: qcprop1
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop1_tket:
+    name: Run Tket after qcprop 1
+    input: qcprop1
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop1_pyzx:
+    name: Run PyZX after qcprop 1
+    input: qcprop1
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop2_qiskit:
+    name: Run Qiskit after qcprop 2
+    input: qcprop2
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop2_tket:
+    name: Run Tket after qcprop 2
+    input: qcprop2
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop2_pyzx:
+    name: Run PyZX after qcprop 2
+    input: qcprop2
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop4_qiskit:
+    name: Run Qiskit after qcprop 4
+    input: qcprop4
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop4_tket:
+    name: Run Tket after qcprop 4
+    input: qcprop4
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop4_pyzx:
+    name: Run PyZX after qcprop 4
+    input: qcprop4
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop8_qiskit:
+    name: Run Qiskit after qcprop 8
+    input: qcprop8
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop8_tket:
+    name: Run Tket after qcprop 8
+    input: qcprop8
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop8_pyzx:
+    name: Run PyZX after qcprop 8
+    input: qcprop8
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop16_qiskit:
+    name: Run Qiskit after qcprop 16
+    input: qcprop16
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop16_tket:
+    name: Run Tket after qcprop 16
+    input: qcprop16
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop16_pyzx:
+    name: Run PyZX after qcprop 16
+    input: qcprop16
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop32_qiskit:
+    name: Run Qiskit after qcprop 32
+    input: qcprop32
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop32_tket:
+    name: Run Tket after qcprop 32
+    input: qcprop32
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop32_pyzx:
+    name: Run PyZX after qcprop 32
+    input: qcprop32
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop64_qiskit:
+    name: Run Qiskit after qcprop 64
+    input: qcprop64
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop64_tket:
+    name: Run Tket after qcprop 64
+    input: qcprop64
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop64_pyzx:
+    name: Run PyZX after qcprop 64
+    input: qcprop64
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop128_qiskit:
+    name: Run Qiskit after qcprop 128
+    input: qcprop128
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop128_tket:
+    name: Run Tket after qcprop 128
+    input: qcprop128
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop128_pyzx:
+    name: Run PyZX after qcprop 128
+    input: qcprop128
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop256_qiskit:
+    name: Run Qiskit after qcprop 256
+    input: qcprop256
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop256_tket:
+    name: Run Tket after qcprop 256
+    input: qcprop256
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop256_pyzx:
+    name: Run PyZX after qcprop 256
+    input: qcprop256
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop512_qiskit:
+    name: Run Qiskit after qcprop 512
+    input: qcprop512
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop512_tket:
+    name: Run Tket after qcprop 512
+    input: qcprop512
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop512_pyzx:
+    name: Run PyZX after qcprop 512
+    input: qcprop512
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop1024_qiskit:
+    name: Run Qiskit after qcprop 1024
+    input: qcprop1024
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop1024_tket:
+    name: Run Tket after qcprop 1024
+    input: qcprop1024
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: python lib/tket_opt.py
+  qcprop1024_pyzx:
+    name: Run PyZX after qcprop 1024
+    input: qcprop1024
+    steps:
+      - run: sed '/opaque/d'
+      - run: sed -E 's#^c(p|u1)\((.+)\) *(.*\[.*\]) *, *(.*\[.*\]) *; *$#u3(0,0,\2/2) \3;\ncx \3, \4;\nu3(0,0,-\2/2) \4;\ncx \3, \4;\nu3(0,0,\2/2) \4;#'
+      - run: sed 's/--//'
+      - run: sed 's#/2/2#/4#g'
+      - run: sed 's#/4/2#/8#g'
+      - run: sed 's#/8/2#/16#g'
+      - run: sed 's#/16/2#/32#g'
+      - run: sed 's#/32/2#/64#g'
+      - run: sed 's#/64/2#/128#g'
+      - run: sed 's#/128/2#/256#g'
+      - run: sed 's#/256/2#/512#g'
+      - run: sed 's#/512/2#/1024#g'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: sed 's/-pi/-1*pi/g'
+      - run: sed 's/, /,/g'
+      - run: python lib/pyzx_opt.py
+  qcprop0_rpo:
+    name: Run Relaxed Peephole Optimization
+    input: qcprop0
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop0_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop0_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop1_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 1
+    input: qcprop1
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop1_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop1_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop2_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 2
+    input: qcprop2
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop2_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop2_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop4_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 4
+    input: qcprop4
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop4_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop4_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop8_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 8
+    input: qcprop8
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop8_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop8_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop16_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 16
+    input: qcprop16
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop16_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop16_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop32_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 32
+    input: qcprop32
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop32_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop32_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop64_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 64
+    input: qcprop64
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop64_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop64_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop128_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 128
+    input: qcprop128
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop128_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop128_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop256_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 256
+    input: qcprop256
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop256_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop256_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop512_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 512
+    input: qcprop512
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop512_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop512_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  qcprop1024_rpo:
+    name: Run Relaxed Peephole Optimization after qcprop 1024
+    input: qcprop1024
+    steps:
+      # decomposition of rccx according to https://arxiv.org/pdf/quant-ph/0312225.pdf
+      - run: sed -E 's#^rccx ([^,]+),([^,]+),(.+)$#ry(pi/4) \3\ncx \2,\3\nry(pi/4) \3\ncx \1,\3\nry(-pi/4) \3\ncx \2,\3\nry(-pi/4) \3#'
+      - run: sed -E 's/^cp\((.+)\)/cu1(\1)/'
+      - run: sed 's/^u(/u3(/'
+      - run: sed 's/^p(/u1(/'
+      - run: lib/rpo_opt.sh
+  qcprop1024_rpo_qiskit:
+    name: Run Qiskit after Relaxed Peephole Optimization
+    input: qcprop1024_rpo
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop1:
+    name: Run qcprop 1 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop1.yml)
+  rpo_qcprop1_qiskit:
+    name: Run Qiskit after RPO and qcprop 1
+    input: rpo_qcprop1
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop2:
+    name: Run qcprop 2 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop2.yml)
+  rpo_qcprop2_qiskit:
+    name: Run Qiskit after RPO and qcprop 2
+    input: rpo_qcprop2
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop4:
+    name: Run qcprop 4 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop4.yml)
+  rpo_qcprop4_qiskit:
+    name: Run Qiskit after RPO and qcprop 4
+    input: rpo_qcprop4
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop8:
+    name: Run qcprop 8 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop8.yml)
+  rpo_qcprop8_qiskit:
+    name: Run Qiskit after RPO and qcprop 8
+    input: rpo_qcprop8
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop16:
+    name: Run qcprop 16 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop16.yml)
+  rpo_qcprop16_qiskit:
+    name: Run Qiskit after RPO and qcprop 16
+    input: rpo_qcprop16
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop32:
+    name: Run qcprop 32 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop32.yml)
+  rpo_qcprop32_qiskit:
+    name: Run Qiskit after RPO and qcprop 32
+    input: rpo_qcprop32
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop64:
+    name: Run qcprop 64 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop64.yml)
+  rpo_qcprop64_qiskit:
+    name: Run Qiskit after RPO and qcprop 64
+    input: rpo_qcprop64
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop128:
+    name: Run qcprop 128 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop128.yml)
+  rpo_qcprop128_qiskit:
+    name: Run Qiskit after RPO and qcprop 128
+    input: rpo_qcprop128
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop256:
+    name: Run qcprop 256 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop256.yml)
+  rpo_qcprop256_qiskit:
+    name: Run Qiskit after RPO and qcprop 256
+    input: rpo_qcprop256
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop512:
+    name: Run qcprop 512 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop512.yml)
+  rpo_qcprop512_qiskit:
+    name: Run Qiskit after RPO and qcprop 512
+    input: rpo_qcprop512
+    steps:
+      - run: python lib/qiskit_opt.py -O3
+  rpo_qcprop1024:
+    name: Run qcprop 1024 after RPO
+    input: qcprop0_rpo
+    steps:
+      - run: (cd .. && _build/install/default/bin/qcprop -c configs/qcprop1024.yml)
+  rpo_qcprop1024_qiskit:
+    name: Run Qiskit after RPO and qcprop 1024
+    input: rpo_qcprop1024
+    steps:
+      - run: python lib/qiskit_opt.py -O3

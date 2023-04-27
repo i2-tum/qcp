@@ -1,0 +1,5 @@
+(ocamllex qasm_lexer)
+
+(library
+ (name qasm_lexer)
+ (libraries tokens))

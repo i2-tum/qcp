@@ -1,0 +1,4 @@
+passes:
+  propagation:
+    nmax: 4
+    alpha: 1.0e-8

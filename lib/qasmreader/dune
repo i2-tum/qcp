@@ -1,0 +1,12 @@
+(library
+ (name qasmreader)
+ (libraries
+  abs
+  str
+  preprocessor
+  qasm_parser
+  qasm_lexer
+  symbol
+  util
+  circuit
+  logging))

@@ -1,0 +1,3 @@
+[submodule "scripts/lib/rpo"]
+	path = scripts/lib/rpo
+	url = git@github.com:1ucian0/rpo.git

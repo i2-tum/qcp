@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  PARALLEL_JOBS: 2
+
+jobs:
+  # Accepts the commit only if the commit message conforms to the style guide explained in the README.md
+  check-commit-message:
+    name: Check Commit Message
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14.x
+      - name: Install dependencies
+        run: npm install
+      - name: Validate all commits from PR
+        run: npx commitlint --from HEAD^1 --to HEAD --verbose
+    
+  # # Accepts the code only if it conforms to style guidelines
+  # lint-fmt:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: Use OCaml 4.14.x
+  #       uses: ocaml/setup-ocaml@v2
+  #       with:
+  #         ocaml-compiler: 4.14.x
+  #         dune-cache: true
+
+  #     - name: Lint fmt
+  #       uses: ocaml/setup-ocaml/lint-fmt@v2
+  
+  # lint-doc:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: Use OCaml 4.14.x
+  #       uses: ocaml/setup-ocaml@v2
+  #       with:
+  #         ocaml-compiler: 4.14.x
+  #         dune-cache: true
+
+  #     - name: Lint doc
+  #       uses: ocaml/setup-ocaml/lint-doc@v2
+  
+  # # Builds the project
+  # build:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os:
+  #         - macos-latest
+  #         - ubuntu-latest
+  #       #  - windows-latest
+  #       ocaml-compiler:
+  #         - 4.14.x
+
+  #   runs-on: ${{ matrix.os }}
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: Use OCaml ${{ matrix.ocaml-compiler }}
+  #       uses: ocaml/setup-ocaml@v2
+  #       with:
+  #         ocaml-compiler: ${{ matrix.ocaml-compiler }}
+
+  #     - run: opam install . --deps-only --with-test
+
+  #     - run: opam exec -- dune build
+
+  #     - run: opam exec -- dune runtest

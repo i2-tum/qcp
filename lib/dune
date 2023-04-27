@@ -1,0 +1,3 @@
+(library
+ (name qcprop)
+ (libraries qasmreader qasmwriter propagation))

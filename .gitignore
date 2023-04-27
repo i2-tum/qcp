@@ -1,0 +1,47 @@
+# images files
+*.pdf
+*.eps
+
+# Python Cache
+__pycache__
+
+# Environment data from Rstudio
+.Rdata
+
+# log files
+*.log
+
+# auxiliary/temporary files
+*~
+
+# npm modules
+node_modules
+
+# ocaml compiled files
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
+
+# ocamlbuild working directory
+_build/
+
+# opam directory
+_opam/
+
+# ocamlbuild targets
+*.byte
+*.native
+
+# oasis generated files
+setup.data
+setup.log
+
+# Merlin configuring file for Vim and Emacs
+.merlin
+

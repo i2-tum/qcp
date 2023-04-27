@@ -1,0 +1,3 @@
+(library
+ (name qasmwriter)
+ (libraries circuit))

@@ -1,0 +1,8 @@
+(menhir
+ (modules "../tokens/tokens" qasm_parser)
+ (merge_into qasm_parser)
+ (flags --external-tokens Tokens))
+
+(library
+ (name qasm_parser)
+ (libraries tokens abs))

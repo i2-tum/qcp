@@ -1,0 +1,6 @@
+(menhir
+ (modules tokens)
+ (flags --only-tokens))
+
+(library
+ (name tokens))
