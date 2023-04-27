@@ -16,9 +16,7 @@ This repository contains submodule(s).
 Clone it with:
 
 ```shell
-git clone git@github.com:i2-tum/qcp.git
-cd qcp
-git submodule update --init --recursive  # this is important to update also the submodule(s)
+git clone --recursive git@github.com:i2-tum/qcp.git
 ```
 
 ### Prerequisites
