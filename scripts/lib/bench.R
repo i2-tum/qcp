@@ -26,10 +26,6 @@ setwd(dirname(args[1]))
 # Load the data
 data = read.csv(basename(args[1]))
 
-# For manual local testing
-setwd("~/quantum/qcprop/circuits/bench/")
-data = read.csv("results.csv")
-
 # Calculate the total number of gates and controls for each gate
 summary = sqldf(
   'select file,
