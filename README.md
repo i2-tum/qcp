@@ -7,6 +7,16 @@ This ensures efficient running time of the optimization.
 
 ## Build and Run
 
+### Clone Repository
+
+This repository contains submodule(s).
+Clone it with:
+
+```shell
+git clone git@github.com:i2-tum/qcp.git
+git submodule update --init --recursive  # this is important to update also the submodule(s)
+```
+
 ### Prerequisites
 
 For the project to compile the following packages need to be installed: `opam`
