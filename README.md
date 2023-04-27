@@ -7,6 +7,9 @@ This ensures efficient running time of the optimization.
 
 ## Build and Run
 
+**Note:**
+We tested those configurations on an Ubuntu 22.04.2 LTS Server installation running in a virtual machine on an M1 Mac.
+
 ### Clone Repository
 
 This repository contains submodule(s).
@@ -14,21 +17,23 @@ Clone it with:
 
 ```shell
 git clone git@github.com:i2-tum/qcp.git
+cd qcp
 git submodule update --init --recursive  # this is important to update also the submodule(s)
 ```
 
 ### Prerequisites
 
-For the project to compile the following packages need to be installed: `opam`
+For the project to compile the following packages need to be installed: `git, opam`
 
 To run the benchmark script additionally, the following packages are required: `yq, pyenv, pyenv virtualenv`
 
 If you also want to create the plots afterwards, the following command must be available: `Rscript`
 
 Links to install the mentioned packages are listed below with their version used:
-- opam (2.1.0): [https://opam.ocaml.org/doc/Install.html](https://opam.ocaml.org/doc/Install.html)
-- yq (4.33.2): [https://github.com/mikefarah/yq#install](https://github.com/mikefarah/yq#install)
-- pyenv (2.3.16) and pyenv-virtualenv (1.2.1): [https://realpython.com/intro-to-pyenv/#installing-pyenv](https://realpython.com/intro-to-pyenv/#installing-pyenv)
+- git (2.34.1): [https://git-scm.com/book/en/v2/Getting-Started-Installing-Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- opam (2.1.2): [https://opam.ocaml.org/doc/Install.html](https://opam.ocaml.org/doc/Install.html)
+- yq (4.33.3): [https://github.com/mikefarah/yq#install](https://github.com/mikefarah/yq#install)
+- pyenv (2.3.17) and pyenv-virtualenv (1.2.1): [https://realpython.com/intro-to-pyenv/#installing-pyenv](https://realpython.com/intro-to-pyenv/#installing-pyenv)
 - R (4.3.0): [https://cran.r-project.org/doc/FAQ/R-FAQ.html#Are-there-Unix_002dlike-binaries-for-R_003f](https://cran.r-project.org/doc/FAQ/R-FAQ.html#Are-there-Unix_002dlike-binaries-for-R_003f)
 
 ### Preparation
