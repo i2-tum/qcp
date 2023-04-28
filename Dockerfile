@@ -1,35 +1,37 @@
-FROM ubuntu:22.04
+FROM ocaml/opam:ubuntu-22.04-ocaml-4.14
 
 # Prevent asking for user input
 ENV DEBIAN_FRONTEND noninteractive
 
 # Update apt
-RUN apt update
-# Install opam
-RUN apt install -y opam
+RUN sudo apt-get update
 # Install yq
-RUN apt install -y wget
-RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-RUN chmod +x /usr/bin/yq
+RUN sudo apt-get install -y wget
+RUN sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+RUN sudo chmod +x /usr/bin/yq
 # Install pyenv
-RUN apt install -y make
-RUN apt install -y build-essential
-RUN apt install -y libssl-dev
-RUN apt install -y zlib1g-dev
-RUN apt install -y libbz2-dev
-RUN apt install -y libreadline-dev
-RUN apt install -y libsqlite3-dev
-RUN apt install -y curl
-RUN apt install -y llvm 
-RUN apt install -y libncurses5-dev
-RUN apt install -y libncursesw5-dev
-RUN apt install -y xz-utils tk-dev
-RUN apt install -y libffi-dev
-RUN apt install -y liblzma-dev
-RUN curl https://pyenv.run | bash
+RUN sudo apt-get install -y make
+RUN sudo apt-get install -y build-essential
+RUN sudo apt-get install -y libssl-dev
+RUN sudo apt-get install -y zlib1g-dev
+RUN sudo apt-get install -y libbz2-dev
+RUN sudo apt-get install -y libreadline-dev
+RUN sudo apt-get install -y libsqlite3-dev
+RUN sudo apt-get install -y curl
+RUN sudo apt-get install -y llvm 
+RUN sudo apt-get install -y libncurses5-dev
+RUN sudo apt-get install -y libncursesw5-dev
+RUN sudo apt-get install -y xz-utils tk-dev
+RUN sudo apt-get install -y libffi-dev
+RUN sudo apt-get install -y liblzma-dev
+RUN sudo curl https://pyenv.run | bash
 # Install R
-RUN apt install -y r-base
-RUN apt install -y r-recommended
+RUN sudo apt-get install -y r-base
+RUN sudo apt-get install -y r-recommended
+
+# user should be already opam, just to be sure
+USER opam
+WORKDIR /home/opam
 
 # Copy project files
 COPY bin .
@@ -56,10 +58,30 @@ COPY packages.R .
 COPY requirements.txt .
 
 # Setup OCaml environment
-RUN make ocaml
+RUN opam install . --deps-only
 # Setup Python environment
-RUN make python
+ENV HOME  /home/opam
+ENV PYENV_ROOT $HOME/.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+RUN export PYENV_ROOT="$HOME/.pyenv"
+RUN command -v pyenv || export PATH="$PYENV_ROOT/bin:$PATH"
+RUN eval "$(pyenv init -)"
+RUN eval "$(pyenv virtualenv-init -)"
+RUN pyenv install -s 3.7.16
+RUN pyenv virtualenv -f 3.7.16 env3.7
+RUN eval "$(pyenv init -)"; \
+    eval "$(pyenv virtualenv-init -)"; \
+    pyenv activate env3.7; \
+    pip install --upgrade pip; \
+    pip install -r scripts/lib/rpo/requirements.txt
+RUN pyenv install -s 3.10.10
+RUN pyenv virtualenv -f 3.10.10 env3.10
+RUN eval "$(pyenv init -)"; \
+    eval "$(pyenv virtualenv-init -)"; \
+    pyenv activate env3.10; \
+    pip install --upgrade pip; \
+    pip install -r requirements.txt
 # Install required R packages
-RUN make R
+RUN sudo Rscript packages.R
 # Build the project
-RUN make build
+RUN dune build
