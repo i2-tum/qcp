@@ -84,4 +84,8 @@ RUN eval "$(pyenv init -)"; \
 # Install required R packages
 RUN sudo Rscript packages.R
 # Build the project
+RUN eval "$(opam env)"
 RUN dune build
+
+COPY README.txt .
+CMD cat README.txt; bash
