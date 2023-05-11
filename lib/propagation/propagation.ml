@@ -8,10 +8,10 @@ open Logging
 (** This files contains a module whose [transform] function performs quantum constant propagation to reduce the number
     of controls of controlled gates. The quantum constatnt propagation is a restricted simulation of the circuit, which
     means that the circuits is simulated until the state of subgroups of qubits of the system becomes too complex. In
-    this case one switches to ⊤ for the state describing that subsystem. 
-    
+    this case one switches to ⊤ for the state describing that subsystem.
+
     TODO:
-    - implement the change to ⊤ if maximum number of summands is reached 
+    - implement the change to ⊤ if maximum number of summands is reached
     - write tests
     - refactor code, i.e. make it more modular, e.g. smaller (and more) functions
   *)
@@ -27,7 +27,7 @@ module Propagation = struct
     else if u.(1).(s) = Complex.zero then 1
     else 2
 
-  (** Applies a given gate to the give state, i.e. the state is modified according to the gate application. This 
+  (** Applies a given gate to the give state, i.e. the state is modified according to the gate application. This
       function does not perform any optimisations such as gate elimination or control reduction.*)
   let rec apply nmax alpha gate (state : state) =
     match gate with
@@ -372,16 +372,14 @@ module Propagation = struct
           let both =
             List.filter (fun i -> not (List.mem i zero || List.mem i one)) cs
           in
-          if both = [] then
-            (* all controls are classically determined *)
-            if zero = [] then
-              (* all controls are in the one state
-                 => gate is always applied (controls can be removed entirely) *)
-              Some gate
-            else
-              (* all controls are in the zero state
+          if zero <> [] then
+            (* some controls are always the zero state
                  => gate is never applied (can be removed entirely) *)
-              None
+            None
+          else if both = [] then
+            (* and zero = [] ==> all controls are in the one state
+                 => gate is always applied (controls can be removed entirely) *)
+            Some gate
           else
             (* there are indices whose bits are sometimes one and sometimes zero *)
             (* check whether there is an all one state, if not never all controls can be one at the same time and thus the
