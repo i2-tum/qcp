@@ -1,5 +1,5 @@
 (** The Module Quantumstate manages the state of a set of qubits. It is implemented as a map that maps computational
-    basis states (keys) to their coeeficients (values). *)
+    basis states (keys) to their coefficients (values). *)
 
 open Util
 
@@ -13,15 +13,15 @@ type t = { qubits_n : int; state : value QM.t }
 (** [empty n] returns an empty map for [n] qubits. *)
 let empty n : t = { qubits_n = n; state = QM.empty }
 
-(** [get i] returns the coefficients of the basis state [k] 
-    @raise Not_found if key [k] does not exists. *)
+(** [get i] returns the coefficients of the basis state [k]
+    @raise Not_found if key [k] does not exist. *)
 let get k (qs : t) = QM.find k qs.state
 
 (** [mem k qs] checks whether the key [k] exists in [qs]. *)
 let mem k (qs : t) = QM.mem k qs.state
 
-(** [add k v qs] adds the binding [(k, v)] to the quantum state. 
-    @raise Illegal_arguement if key already exists. *)
+(** [add k v qs] adds the binding [(k, v)] to the quantum state.
+    @raise Illegal_arguement if the key already exists. *)
 let add k v (qs : t) =
   if QM.mem k qs.state then invalid_arg "[quantum state] Key already exists."
   else { qubits_n = qs.qubits_n; state = QM.add k v qs.state }
@@ -29,7 +29,7 @@ let add k v (qs : t) =
 (** [init k v n] returns a new map for [n] qubits only containing the one given key-value pair. *)
 let init k v n : t = add k v { qubits_n = n; state = QM.empty }
 
-(** [set k v qs] adds the binding [(k, v)] to the quantum state. 
+(** [set k v qs] adds the binding [(k, v)] to the quantum state.
     @raise Illegal_arguement if key does not exist. *)
 let set k v (qs : t) =
   if not @@ QM.mem k qs.state then
@@ -44,9 +44,9 @@ let remove k (qs : t) =
   else { qubits_n = qs.qubits_n; state = QM.remove k qs.state }
 
 (** [update f combine qs] applies [f] to all key-value pairs existing in the map. The function [f] has to return a list
-    (associative list) with all key-value pairs that should be present in the new updated map. If the function [f] 
-    generates a key-value pair whose key already was added by an earlier invocation of [f], the [combine] function is 
-    used to combine those two values, the existing one and the new one for the same key. *)
+    (associative list) with all key-value pairs that should be present in the newly updated map. If the function [f]
+    generates a key-value pair whose key was already added by an earlier invocation of [f], the [combine] function is
+    used to combine those two values, the existing one and the new one, for the same key. *)
 let update f (qs : t) =
   let ff k v m =
     (* args: key value map *)
@@ -60,7 +60,7 @@ let update f (qs : t) =
   in
   QM.fold ff qs.state (empty qs.qubits_n)
 
-(** [merge qs1 qs2 seq] merges the two quantum states into one, i.e. it merges the bit sequences of the key
+(** [merge qs1 qs2 seq] merges the two quantum states into one, i.e., it merges the bit sequences of the key
     according to the sequence given as [seq] and updates the amplitudes accordingly. *)
 let merge (qs1 : t) (qs2 : t) seq =
   QM.fold
@@ -74,7 +74,7 @@ let merge (qs1 : t) (qs2 : t) seq =
     (empty (qs1.qubits_n + qs2.qubits_n))
 
 (** [filter alpha qs] drops all basis-states with amplitudes below or equal to the threshold [alpha] and rescales the
-    remaining amplitudes afterwards such that the sum over the squared absolute values of the amplitudes is still equal 
+    remaining amplitudes afterward such that the sum over the squared absolute values of the amplitudes is still equal
     to one. *)
 let filter alpha (qs : t) =
   let { qubits_n; state } = qs in

@@ -5,15 +5,15 @@ open Circuit
 open Util
 open Logging
 
-(** This files contains a module whose [transform] function performs quantum constant propagation to reduce the number
-    of controls of controlled gates. The quantum constatnt propagation is a restricted simulation of the circuit, which
-    means that the circuits is simulated until the state of subgroups of qubits of the system becomes too complex. In
-    this case one switches to ⊤ for the state describing that subsystem.
+(** This file contains a module whose [transform] function performs quantum constant propagation to reduce the number
+    of controls of controlled gates. The quantum constant propagation is a restricted simulation of the circuit, which
+    means that the circuit is simulated until the state of subgroups of qubits of the system becomes too complex. In
+    this case, one switches to ⊤ the state describing that subsystem.
 
     TODO:
-    - implement the change to ⊤ if maximum number of summands is reached
+    - implement the change to ⊤ if the maximum number of summands is reached
     - write tests
-    - refactor code, i.e. make it more modular, e.g. smaller (and more) functions
+    - refactor code, i.e., make it more modular, e.g., smaller (and more) functions
   *)
 
 (** This module actually implements the quantum constant propagation. *)
@@ -27,8 +27,8 @@ module Propagation = struct
     else if u.(1).(s) = Complex.zero then 1
     else 2
 
-  (** Applies a given gate to the give state, i.e. the state is modified according to the gate application. This
-      function does not perform any optimisations such as gate elimination or control reduction.*)
+  (** Applies a given gate to the given state, i.e., the state is modified according to the gate application. This
+      function does not perform any optimizations such as gate elimination or control reduction.*)
   let rec apply nmax alpha gate (state : state) =
     match gate with
     | H i
@@ -47,7 +47,7 @@ module Propagation = struct
     | Z i ->
         (* all non-controlled single-qubit gates *)
         if get i state = TOP then
-          (* cannot do anything, entanglement group is already in top *)
+          (* cannot do anything; entanglement group is already in top *)
           state
         else
           (* the position of qubit [i] within its entanglement group is [j] *)
@@ -61,7 +61,7 @@ module Propagation = struct
               * summands_per_basis u 1
           in
           (* calculate the number of summands estimated after the application of the gate without actually calculating
-             the state. For that we count all states where qubit [i] is in |0⟩ state and multiply it by the number of non-
+             the state. For that, we count all states where qubit [i] is in |0⟩ state and multiply it by the number of non-
              zero entries in the corresponding (first) column of the unitary. Analogously, we do the same for the state |1⟩
              and add the result. *)
           if n > nmax then set i TOP state
@@ -95,7 +95,7 @@ module Propagation = struct
               let state = filter alpha state in
               if is_empty state then TOP else ELEMENT state
             in
-            (* apply the above defined transformations to the [state]. *)
+            (* apply the above-defined transformations to the [state]. *)
             set i (top_if_empty @@ update mul (the @@ get i state)) state
     | ECR (i1, i2) | RXX (_, i1, i2) | RYY (_, i1, i2) | RZZ (_, i1, i2) ->
         if get i1 state = TOP then set i2 TOP state
@@ -107,7 +107,7 @@ module Propagation = struct
           let u = unitary_of_gate gate in
           let n = 0 (* TODO *) in
           (* calculate the number of summands estimated after the application of the gate without actually calculating
-             the state. For that we count all states where qubit [i] is in |0⟩ state and multiply it by the number of non-
+             the state. For that, we count all states where qubit [i] is in |0⟩ state and multiply it by the number of non-
              zero entries in the corresponding (first) column of the unitary. Analogously, we do the same for the state |1⟩
              and add the result. *)
           if n > nmax then
@@ -214,10 +214,10 @@ module Propagation = struct
               let state = filter alpha state in
               if is_empty state then TOP else ELEMENT state
             in
-            (* apply the above defined transformations to the [state]. *)
+            (* apply the above-defined transformations to the [state]. *)
             set i1 (top_if_empty @@ update mul (the @@ get i1 state)) state
     | RCCX (i, j, k) ->
-        (* decomposition of the simplified toffoli gate according to https://arxiv.org/pdf/quant-ph/0312225.pdf *)
+        (* decomposition of the simplified Toffoli gate according to https://arxiv.org/pdf/quant-ph/0312225.pdf *)
         state
         |> apply nmax alpha (CTRL ([ i; j ], 0., Y k))
         |> apply nmax alpha (CTRL ([ i ], 0., Z k))
@@ -235,19 +235,19 @@ module Propagation = struct
     | CTRL (cs, gamma, (U2 (_, _, i) as gate))
     | CTRL (cs, gamma, (U3 (_, _, _, i) as gate))
     | CTRL (cs, gamma, (P (_, i) as gate)) ->
-        (* Will not try to create the smallest entanglement group since it assumes that all superflous qubits, e.g.
+        (* Will not try to create the smallest entanglement group since it assumes that all superfluous qubits, e.g.
            those that are in a computational basis state were removed before *)
         (* Opposed to earlier assumptions, all affected qubits must be enclosed in one entanglement group *)
         (* construct the union of all elements covered by the controls and the target qubit. *)
         (* For the union of separate groups, we need a filtered list of control qubits. One that only contains one
-           qubit per entry (= entanglement group), here the first one of those is choosen. *)
+           qubit per entry (= entanglement group), here the first one of those is chosen. *)
         let rec filter_cs acc = function
           | [] -> (
               match acc with
               | [] -> invalid_arg "[propagation] this should not happen."
               | [ c ] ->
-                  (* if in the end only one control remains, we keep it in the
-                      list if it needs to be united with [i], otherwise, we return an empty list. *)
+                  (* if, in the end, only one control remains, we keep it in the
+                      list if it needs to be united with [i]; otherwise, we return an empty list. *)
                   if same i c state then [] else [ c ]
               | _ ->
                   List.rev acc (* here [acc] contains at least two elements. *))
@@ -274,7 +274,7 @@ module Propagation = struct
         else
           (* get the matrix description of the basic gate without controls *)
           let u = unitary_of_gate gate in
-          (* apply gloabl phase *)
+          (* apply global phase *)
           let u =
             matrix_mul u
               [|
@@ -283,11 +283,11 @@ module Propagation = struct
               |]
           in
           (* calculates the number [n] of summands in the element that will be generated.
-              This number can be divided into two parts. The latter part are all combinations where at least one control
-              qubit is not satisfied and, hence, the identity is applied to the target qubit not changing the number of
+              This number can be divided into two parts. The latter part is all combinations where at least one control
+              qubit is not satisfied, and, hence, the identity is applied to the target qubit, not changing the number of
               those state. The first part comprises all states where all control qubits are satisfied and, hence, the
-              gate is applied to the target qubit. In this case we need to multiply the number of states where all
-              control qubits are satisfied with the number of states induced by the application of the gate separated
+              gate is applied to the target qubit. In this case, we need to multiply the number of states where all
+              control qubits are satisfied with the number of states induced by the application of the gate separating
               by those where the target state is |0⟩ and those where it is |1⟩. *)
           let group = the @@ get i state in
           let js = List.map (fun c -> pos_in_group c state) cs in
@@ -312,7 +312,11 @@ module Propagation = struct
           else
             (* n ≤ nmax *)
             (* if all controls are satisfied, the gate is applied similarly to the uncontrolled case; if not, the
+<<<<<<< HEAD
                key-value pair is inserted unchanged again. *)
+=======
+              key-value pair is inserted unchanged again. *)
+>>>>>>> 4d7e0c6 (Fix spelling errors)
             let mul k v =
               if List.for_all (fun j -> nth_bit k j = 1) js then
                 if nth_bit k j = 0 then
@@ -382,10 +386,10 @@ module Propagation = struct
             Some gate
           else
             (* there are indices whose bits are sometimes one and sometimes zero *)
-            (* check whether there is an all one state, if not never all controls can be one at the same time and thus the
+            (* check whether there is an all-one state; if not, never all controls can be one at the same time, and thus the
                gate can be removed entirely *)
-            (* the function [group] splits a list of indices in groups corresponding to different sets in the state,
-               i.e. qubits within one group are entangled but not with ones outside the group *)
+            (* the function [group] splits a list of indices into groups corresponding to different sets in the state,
+               i.e., qubits within one group are entangled but not with ones outside the group *)
             let rec group acc = function
               | [] -> acc
               | c :: _ as cs ->
@@ -393,7 +397,7 @@ module Propagation = struct
                   group (c1 :: acc) c2
             in
             let groups = group [] cs in
-            (* this function assumes that all indices are in one group, i.e. they are entangled *)
+            (* this function assumes that all indices are in one group, i.e., they are entangled *)
             let exists_all_one is =
               let i = List.hd is in
               if get i state = TOP then true
@@ -405,9 +409,9 @@ module Propagation = struct
             in
             if List.for_all exists_all_one groups then
               (* there is a state such that every control can be satisfied *)
-              (* Within each group there may be superflouos bits those whose one state is implied by another bit in the
-                 group. So we minimize the number of indices in each group such that if all of the remainig indices are in
-                 the one state the rest is as well. *)
+              (* Within each group, there may be superfluous bits those whose one state is implied by another bit in the
+                 group. So we minimize the number of indices in each group such that if all of the remaining indices are in
+                 the one state, the rest is as well. *)
               let rec filter_group acc = function
                 | [] -> acc
                 | c :: cs ->
@@ -446,31 +450,31 @@ module Propagation = struct
               Some gate
             else
               (* there is no state where all controls are one at the same time
-                 => the gate will never be applied (and can be removed entirely) *)
+                 => The gate will never be applied (and can be removed entirely) *)
               None
       | _ ->
-          (* uncontrolled gates will not be optimised by this pass *)
+          (* this pass will not optimize uncontrolled gates *)
           Some gate
     in
     match gate with
     | None ->
-        (* if the gate was removed entirely, the state does not need to be modified and we signal the filter to
+        (* if the gate was removed entirely, the state does not need to be modified, and we signal the filter to
            remove the gate by returning [None]. *)
         None
     | Some gate ->
-        (* the state is modified according to the gate with the minimised number of control qubits *)
+        (* the state is modified according to the gate with the minimized number of control qubits *)
         let state = apply nmax alpha gate state in
         Some (gate, state)
 
-  (** Transform applies the constant propagation and removes superflouos controls by simulating the circuit partially.
+  (** Transform applies the constant propagation and removes superfluous controls by simulating the circuit partially.
       @param nmax Threshold to limit the number of coefficients
-      @param alpha Threshold to cut off coeeficients *)
+      @param alpha Threshold to cut off coefficients *)
   let transform nmax alpha circ =
     (* Intialise the state with one element per key, i.e. the qubits are not entangled. *)
     let state =
       make circ.size (element @@ Quantumstate.init Z.zero Complex.one 1)
     in
-    (* Map every gate to a gate where the controls are minimised or the gate is removed entirely. For that pass the
+    (* Map every gate to a gate where the controls are minimized or the gate is removed entirely. For that, pass the
        state to the mapping function that keeps track of the current quantum state in a restricted fashion. *)
     let _, gates = map_state_filter (map nmax alpha) state circ.gates in
     { size = circ.size; gates }
