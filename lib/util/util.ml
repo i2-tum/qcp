@@ -58,7 +58,7 @@ let string_of_complex (c : Complex.t) =
     and passes it to the next call of [f]. *)
 let map_state f state xs =
   let rec aux state acc = function
-    | [] -> state, List.rev acc
+    | [] -> (state, List.rev acc)
     | x :: xs ->
         let x, state = f state x in
         aux state (x :: acc) xs
@@ -70,7 +70,7 @@ let map_state f state xs =
     [state] to be passed to the next call of [f]. *)
 let map_state_filter f state xs =
   let rec aux state acc = function
-    | [] -> state, List.rev acc
+    | [] -> (state, List.rev acc)
     | x :: xs -> (
         match f state x with
         | None -> aux state acc xs
