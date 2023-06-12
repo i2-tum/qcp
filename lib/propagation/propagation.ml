@@ -417,11 +417,11 @@ module Propagation = struct
                     else
                       let j = pos_in_group c state in
                       (* remove all indices whose one states are implied by [c] *)
-                      (* NOTE: the choice of indices to remove is not always unique, for always the first one of a group of equal
-                         "strong" indices is taken an the rest is removed. There is space for optimization if one chooses the
-                         control to keep carefully such that it cancels out with another gate for example.
-                         In case of controlled phase gates there is even thed choice which index is the control and which one the
-                         target index. This could also be exploited further. *)
+                      (* NOTE: the choice of indices to remove is not always unique, here, always the first one of a
+                         group of equal "strong" indices is taken, and the rest is removed. There is space for
+                         optimization if one chooses the control to keep carefully such that it cancels out with another
+                         gate, for example. In the case of controlled phase gates, there is even the choice which index
+                         is the control and which one the target index. This could also be exploited further. *)
                       let filter i =
                         (* Suggested by reviewer to replace this condition, see comment 10 lines below *)
                         (* i <= c || *)
