@@ -311,8 +311,8 @@ module Propagation = struct
           if n > nmax then set i TOP state
           else
             (* n ≤ nmax *)
-            (* if all controls are satisfied the gate is applied similar to the uncontrolled case, if not the key-value pair
-                is inserted unchanged again. *)
+            (* if all controls are satisfied, the gate is applied similarly to the uncontrolled case; if not, the
+               key-value pair is inserted unchanged again. *)
             let mul k v =
               if List.for_all (fun j -> nth_bit k j = 1) js then
                 if nth_bit k j = 0 then
@@ -423,16 +423,20 @@ module Propagation = struct
                          In case of controlled phase gates there is even thed choice which index is the control and which one the
                          target index. This could also be exploited further. *)
                       let filter i =
-                        i <= c
-                        (* smaller indices must not be considered in the condition below, see also note above. *)
-                        || not
-                           @@ for_all_keys
-                                (fun k ->
-                                  nth_bit k j = 1
-                                  ==> (nth_bit k (pos_in_group i state) = 1))
-                                (the @@ get c state)
+                        (* Suggested by reviewer to replace this condition, see comment 10 lines below *)
+                        (* i <= c || *)
+                        i = c ||
+                        not
+                        @@ for_all_keys
+                             (fun k ->
+                               nth_bit k j = 1
+                               ==> (nth_bit k (pos_in_group i state) = 1))
+                             (the @@ get c state)
                       in
-                      filter_group (List.filter filter acc) cs
+                      filter_group (List.filter filter acc)
+                        (List.filter filter cs)
+                (* the filtering of cs is required since we omit the condition 10 lines above; this way, we find more
+                   implications, namely in both directions *)
               in
               (* filter the groups *)
               let groups = List.map (fun cs -> filter_group cs cs) groups in
