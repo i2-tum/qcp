@@ -312,11 +312,7 @@ module Propagation = struct
           else
             (* n ≤ nmax *)
             (* if all controls are satisfied, the gate is applied similarly to the uncontrolled case; if not, the
-<<<<<<< HEAD
                key-value pair is inserted unchanged again. *)
-=======
-              key-value pair is inserted unchanged again. *)
->>>>>>> 4d7e0c6 (Fix spelling errors)
             let mul k v =
               if List.for_all (fun j -> nth_bit k j = 1) js then
                 if nth_bit k j = 0 then
