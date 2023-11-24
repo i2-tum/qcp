@@ -17,8 +17,6 @@ updates:
       day: "friday"
       time: "07:00"
       timezone: "Europe/Berlin"
-    assignees:
-      - "ystade"
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -32,8 +30,6 @@ updates:
       day: "friday"
       time: "07:00"
       timezone: "Europe/Berlin"
-    assignees:
-      - "ystade"
 
   # Keep packages.json up-to-date
   - package-ecosystem: "npm"
@@ -45,5 +41,3 @@ updates:
       day: "friday"
       time: "07:00"
       timezone: "Europe/Berlin"
-    assignees:
-      - "ystade"
